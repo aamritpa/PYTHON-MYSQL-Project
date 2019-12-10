@@ -51,8 +51,8 @@ def function(value):
                     maximum= int(input('Please enter maximum price\n'))
                     startDate = input('Enter a Startdate in YYYY-MM-DD format:\n')
                     endDate = input('Enter a Enddate in YYYY-MM-DD format:\n')
-                    query="SELECT DISTINCT id,name,number_of_bedrooms,SUBSTRING(description,1,25),MAX(price) FROM Listings,Calendar WHERE id=listing_id AND (date >= ? AND date <= ? )AND (price >= ? AND price <= ?) AND  id NOT IN  (SELECT listing_id FROM Calendar WHERE (date >= ? AND date <= ?) AND (price >= ? AND price <= ? AND available = 0)) GROUP BY id,name,SUBSTRING(description,1,25),number_of_bedrooms"
-                    cursor.execute(query,startDate,endDate,minimum,maximum,startDate,endDate,minimum,maximum)                       
+                    query="SELECT DISTINCT id,name,number_of_bedrooms,SUBSTRING(description,1,25),MAX(price) FROM Listings,Calendar WHERE id=listing_id AND (date >= ? AND date <= ? ) AND  id NOT IN  (SELECT listing_id FROM Calendar WHERE (date >= ? AND date <= ?) AND (price > ? or price < ? or available = 0)) GROUP BY id,name,SUBSTRING(description,1,25),number_of_bedrooms"
+                    cursor.execute(query,startDate,endDate,startDate,endDate,maximum,minimum)                       
         
                 if command=='3':
                     noOfBedrooms= int(input("Please Enter Number of Bedrooms:\n"))
@@ -67,8 +67,8 @@ def function(value):
                     noOfBedrooms= int(input("Please Enter Number of Bedrooms:\n"))
                     startDate = input('Enter a Startdate in YYYY-MM-DD format:\n')
                     endDate = input('Enter a Enddate in YYYY-MM-DD format:\n')
-                    query="SELECT DISTINCT id,name,number_of_bedrooms,LEFT(description,25),MAX(price) FROM Listings,Calendar WHERE number_of_bedrooms= ? AND price >= ? AND price <= ? and id=listing_id AND (date >= ? AND date <= ? )AND  id NOT IN  (SELECT listing_id FROM Calendar WHERE (date >= ? AND date <= ?) AND (price >= ? AND price <= ? AND available = 0)) GROUP BY id,name,LEFT(description,25),number_of_bedrooms"
-                    cursor.execute(query,noOfBedrooms,minimum,maximum,startDate,endDate,startDate,endDate,minimum,maximum)
+                    query="SELECT DISTINCT id,name,number_of_bedrooms,LEFT(description,25),MAX(price) FROM Listings,Calendar WHERE number_of_bedrooms= ? and id=listing_id AND (date >= ? AND date <= ? )AND  id NOT IN  (SELECT listing_id FROM Calendar WHERE (date >= ? AND date <= ?) AND (price > ? or price < ? or available = 0)) GROUP BY id,name,LEFT(description,25),number_of_bedrooms"
+                    cursor.execute(query,noOfBedrooms,startDate,endDate,startDate,endDate,maximum,minimum)
             
                 if command !='1' and command !='2'  and command !='3'  and command !='4':
                     print('Wrong input\n')
@@ -83,7 +83,8 @@ def function(value):
         records = cursor.fetchall()
         
         if len(records) == 0:
-            print("\nERROR! WITH THE ABOVE DETAILS NO DATA IS FOUND:\n")        
+            print("\nERROR! WITH THE ABOVE DETAILS NO DATA IS FOUND:\n")
+            function(1)        
         else:
             for row in records:
                 print("Id = ", row[0])
@@ -118,8 +119,8 @@ def function(value):
         review_or_not= input('Do you want to Add a Reviews Enter -yes/no \n')
 
         if review_or_not=='no':
-            print('Ended\n')
-            print('To Search, book, and review Please run programme again\n')
+            print('\n')
+            function(1)
         else:
             entered_name= input('Please Enter your name\n')
             query= "Select * From Bookings Where guest_name=?"
@@ -128,6 +129,7 @@ def function(value):
 
             if len(record)==0:
                 print('No Data Found with this name')
+                function(1)
             else:
                 for i in record:
                     print('id',i[0])
